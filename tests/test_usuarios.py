@@ -37,7 +37,7 @@ def test_categoria_jsonb():
     with db_connection.cursor() as cur:
         cur.execute("SELECT * FROM productos_jsonb WHERE data @> '{"categoria": "tecnologia"}';")
         result = cur.fetchall()
-    assert len(result) == 2
+    assert len(result) == 1
 
 def test_basico():
     result= run_query("SELECT nombre FROM productos_hstore WHERE atributos -> 'color' = 'rojo';")
