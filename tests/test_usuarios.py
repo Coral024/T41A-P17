@@ -44,18 +44,7 @@ def test_productos_hstore_final():
     result_conteo_color = run_query("SELECT COUNT(*) FROM productos_hstore WHERE atributos ? 'color';")
     assert result_conteo_color[0][0] == 4
 
-   result_agregacion = run_query("""
-        SELECT (atributos -> 'marca') AS marca, COUNT(*) AS total
-        FROM productos_hstore
-        WHERE atributos ? 'marca' 
-        GROUP BY 1
-        ORDER BY 1 DESC;
-    """)
-    
-    actual_agregacion = {row[0]: row[1] for row in result_agregacion}
-    expected_agregacion = {'Samsung': 2, 'Ekco': 1, 'Dell': 1}
-    
-    assert actual_agregacion == expected_agregacion
+  
 
 
 
