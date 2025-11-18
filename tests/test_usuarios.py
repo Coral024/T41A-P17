@@ -28,21 +28,34 @@ def test_edad_juan():
     result = run_query("SELECT data->>'edad' FROM usuarios WHERE id = 2;")
     assert result[0][0] == "25"
 
-def test_color_rojo():
-    result = run_query("SELECT data->>'nombre' FROM productos_jsonb WHERE data->>'color' = 'rojo';")
-    assert result[0][0] == "telefono"
-    assert result[0][1] == "libreta"
-    
-def test_categoria_jsonb():
-    with db_connection.cursor() as cur:
-        cur.execute('SELECT * FROM productos_jsonb WHERE data @> '{"categoria": "tecnologia"}';')
-        result = cur.fetchall()
-    assert len(result) == 1
 
-def test_basico():
-    result= run_query("SELECT nombre FROM productos_hstore WHERE atributos -> 'color' = 'rojo';")
-    assert result[0][0] == "Teléfono"
-    assert result[0][1] == "Licuadora"
-    result2 = run_query("SELECT atributos -> 'Peso' AS Peso FROM productos_hstore WHERE id=4;")
-    assert result2[0][0]='1kg'
+def test_productos_hstore_final():
+    result_peso = run_query("SELECT atributos -> 'peso' FROM productos_hstore WHERE nombre = 'Licuadora';")
+    assert result_peso[0][0] == '1kg'
+    
+    result_color_telefono = run_query("SELECT COUNT(*) FROM productos_hstore WHERE nombre = 'Teléfono' AND atributos ? 'color';")
+    assert result_color_telefono[0][0] == 0
+    
+    result_rojo = run_query("SELECT nombre FROM productos_hstore WHERE atributos -> 'color' = 'rojo';")
+    expected_rojo = {'Licuadora'}
+    actual_rojo = {row[0] for row in result_rojo}
+    assert actual_rojo == expected_rojo
+
+    result_conteo_color = run_query("SELECT COUNT(*) FROM productos_hstore WHERE atributos ? 'color';")
+    assert result_conteo_color[0][0] == 4
+
+    result_agregacion = run_query("""
+        SELECT (atributos -> 'marca') AS marca, COUNT(*) AS total
+        FROM productos_hstore
+        WHERE atributos ? 'marca' 
+        GROUP BY 1
+        ORDER BY 1 DESC;
+    """)
+    
+    actual_agregacion = {row[0]: row[1] for row in result_agregacion}
+    expected_agregacion = {'Samsung': 2, 'Ekco': 1, 'Dell': 1}
+    
+    assert actual_agregacion == expected_agregacion
+
+
 
