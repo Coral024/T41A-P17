@@ -35,7 +35,7 @@ def test_color_rojo():
     
 def test_categoria_jsonb():
     with db_connection.cursor() as cur:
-        cur.execute("SELECT * FROM productos_jsonb WHERE data @> '{"categoria": "tecnologia"}';")
+        cur.execute('SELECT * FROM productos_jsonb WHERE data @> '{"categoria": "tecnologia"}';')
         result = cur.fetchall()
     assert len(result) == 1
 
